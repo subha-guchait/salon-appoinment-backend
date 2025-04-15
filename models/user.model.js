@@ -31,9 +31,15 @@ const User = sequelize.define("user", {
     type: Sequelize.BOOLEAN,
     allowNull: false,
   },
+  role: {
+    type: Sequelize.ENUM("customer", "admin"),
+    allowNull: false,
+    defaultValue: "customer",
+  },
   tokenVersion: {
     type: Sequelize.INTEGER,
     defaultValue: 0,
+    allowNull: true,
   },
 });
 

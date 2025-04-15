@@ -1,9 +1,16 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const createUser = require("../services/user.service");
+const { createUser } = require("./user.service");
 
-const registerUser = async ({ name, email, phone, password, isAccepted }) => {
+const registerUser = async ({
+  name,
+  email,
+  phone,
+  password,
+  isAccepted,
+  role,
+}) => {
   try {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
@@ -14,9 +21,11 @@ const registerUser = async ({ name, email, phone, password, isAccepted }) => {
       phone,
       password: hashedPassword,
       isAccepted,
+      role,
     });
   } catch (err) {
-    throw new Error("User registration failed:", err.message);
+    console.log(err.message);
+    throw new Error("User registration failed");
   }
 };
 
@@ -26,6 +35,7 @@ const generateAuthToken = (user) => {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role,
       tokenVersion: user.tokenVersion,
     },
     process.env.JWT_SECRET,
