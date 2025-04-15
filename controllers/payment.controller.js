@@ -54,6 +54,8 @@ exports.processPayment = asyncHandler(async (req, res, next) => {
     status: "pending",
     appoinmentId: appoinmentId,
   });
+
+  res.status(200).json({ sucess: true, paymentSessionId, orderId });
 });
 
 exports.updatepaymentStatus = asyncHandler(async (req, res, next) => {

@@ -28,3 +28,5 @@ const Payment = sequelize.define("payment", {
     defaultValue: "Pending",
   },
 });
+
+module.exports = Payment;
