@@ -10,10 +10,14 @@ exports.authenticate = asyncHandler(async (req, res, next) => {
   }
   const user = jwt.verify(token, process.env.JWT_SECRET);
 
+  console.log("user.....", user);
+
   if (!user) {
     return next(new ErrorHandler("Invalid or expired token", 401));
   }
   const userDetails = await getUserDetails(user.id);
+
+  console.log("user details", userDetails);
 
   if (!userDetails) {
     return next(new ErrorHandler("User not found", 401));

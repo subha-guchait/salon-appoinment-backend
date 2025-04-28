@@ -1,8 +1,10 @@
 const { Cashfree } = require("cashfree-pg");
 
-Cashfree.XClientId = process.env.CLIENT_ID;
-Cashfree.XClientSecret = process.env.CLIENT_SECRET;
-Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
+let cashfree = new Cashfree(
+  Cashfree.SANDBOX,
+  process.env.CLIENT_ID,
+  process.env.CLIENT_SECRET
+);
 
 const createorder = async (
   orderId,
@@ -14,6 +16,15 @@ const createorder = async (
   customerEmail
 ) => {
   try {
+    console.log(
+      orderId,
+      orderAmount,
+      orderCurrency,
+      customerID,
+      customerPhone,
+      customerName,
+      customerEmail
+    );
     const expiryDate = new Date(Date.now() + 30 * 60 * 1000); // 30 minutes from now
     const formattedExpiryDate = expiryDate.toISOString();
 
@@ -22,7 +33,7 @@ const createorder = async (
       order_currency: orderCurrency,
       order_id: orderId,
       customer_details: {
-        customer_id: customerID,
+        customer_id: String(customerID),
         customer_phone: customerPhone,
         customer_name: customerName,
         customer_email: customerEmail,
@@ -30,7 +41,7 @@ const createorder = async (
       order_meta: {
         // return_url:
         //   "https://www.cashfree.com/devstudio/preview/pg/web/popupCheckout?order_id={order_id}",
-        return_url: `http://localhost:3000/purchase/updatetransactionstatus/${orderId}`,
+        return_url: `http://localhost:3000/api/payments/verify/${orderId}`,
         notify_url:
           "https://www.cashfree.com/devstudio/preview/pg/webhooks/32129369",
         // payment_methods: "cc,dc,upi",
@@ -38,7 +49,9 @@ const createorder = async (
       order_expiry_time: formattedExpiryDate,
     };
 
-    const response = await Cashfree.PGCreateOrder("2023-08-01", request);
+    console.log(request);
+
+    const response = await cashfree.PGCreateOrder(request);
 
     console.log(
       " cashfree services payment session id ",
@@ -47,14 +60,20 @@ const createorder = async (
 
     return response.data.payment_session_id;
   } catch (err) {
-    console.log("Error creating order:", err.message);
+    if (err.response) {
+      console.log("Error response data:", err.response.data);
+      console.log("Error response status:", err.response.status);
+      console.log("Error response headers:", err.response.headers);
+    } else {
+      console.log("Error:", err.message);
+    }
   }
 };
 
 const getPaymentStatus = async (orderId) => {
+  console.log("order id in get payment status", orderId);
   try {
-    const response = await Cashfree.PGOrderFetchPayments("2025-01-01", orderId);
-
+    const response = await cashfree.PGOrderFetchPayments(orderId);
     let getOrderResponse = response.data;
     let orderStatus;
 
@@ -63,7 +82,7 @@ const getPaymentStatus = async (orderId) => {
         (transaction) => transaction.payment_status === "SUCCESS"
       ).length > 0
     ) {
-      orderStatus = "Sucess";
+      orderStatus = "Success";
     } else if (
       getOrderResponse.filter(
         (transaction) => transaction.payment_status === "PENDING"
@@ -77,7 +96,13 @@ const getPaymentStatus = async (orderId) => {
     console.log("Order Status:", orderStatus);
     return orderStatus;
   } catch (err) {
-    console.log("Error fetching payment status:", err.message);
+    if (err.response) {
+      console.log("Error response data:", err.response.data);
+      console.log("Error response status:", err.response.status);
+      console.log("Error response headers:", err.response.headers);
+    } else {
+      console.log("Error:", err.message);
+    }
   }
 };
 

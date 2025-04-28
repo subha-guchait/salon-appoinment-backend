@@ -1,4 +1,5 @@
 const Staff = require("../models/staff.model");
+const Service = require("../models/service.model");
 
 const getStaffByEmail = async (email) => {
   try {
@@ -21,11 +22,43 @@ const createStaff = async (staffData) => {
 const getAllStaff = async () => {
   try {
     return await Staff.findAll({
-      attributes: ["id", "name", "email", "phone", "specialization"],
+      attributes: ["id", "name", "email", "phone"],
+      include: {
+        model: Service,
+        attributes: ["name"],
+      },
     });
   } catch (err) {
     throw new Error("getting all Staff failed");
   }
 };
 
-module.exports = { getStaffByEmail, createStaff, getAllStaff };
+const deleteStaff = async (staffId) => {
+  try {
+    const staff = await Staff.findByPk(staffId);
+    if (!staff) {
+      throw new Error("Staff not found");
+    }
+
+    return await staff.destroy();
+  } catch (error) {
+    throw new Error("Unable to delete staff");
+  }
+};
+
+const getStaffsByService = async (serviceId) => {
+  try {
+    return await Staff.findAll({ where: { serviceId: serviceId } });
+  } catch (err) {
+    console.log(err.message);
+    throw new Error("Unable to find staff by serviceId");
+  }
+};
+
+module.exports = {
+  getStaffByEmail,
+  createStaff,
+  getAllStaff,
+  deleteStaff,
+  getStaffsByService,
+};

@@ -21,16 +21,6 @@ const Staff = sequelize.define("staff", {
     type: Sequelize.STRING,
     allowNull: false,
   },
-  specialization: {
-    type: Sequelize.ENUM(
-      "Hair Stylist",
-      "Makeup Artist",
-      "Nail Technician",
-      "Facial Expert",
-      "Massage Therapist"
-    ),
-    allowNull: false,
-  },
 });
 
 module.exports = Staff;

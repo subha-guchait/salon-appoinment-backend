@@ -4,6 +4,7 @@ const getAllServices = async () => {
   try {
     return await Service.findAll();
   } catch (err) {
+    console.log(err);
     throw new Error("unable to get all services");
   }
 };
@@ -32,7 +33,7 @@ const updateServiceRecord = async (serviceId, updatedData) => {
 
 const getServiceRecord = async (serviceId) => {
   try {
-    return await Service.findByPk(serviceId);
+    return await Service.findOne({ where: { id: serviceId } });
   } catch (err) {
     console.log(err);
     throw new Error("unable to get service");

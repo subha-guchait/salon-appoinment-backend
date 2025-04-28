@@ -19,7 +19,12 @@ router.get("/", authenticate, getAppoinments);
 router.get("/admin", authenticate, isAdmin, getAllSheduledAppoinmentsAdmin);
 router.get("/:appoinmentId", authenticate, getAppoinment);
 router.put("/cancel/:appoinmentId", authenticate, cancelAppoinment);
-router.put("/complete/admin/:appoinmentid", isAdmin, completeAppoinment);
+router.put(
+  "/complete/admin/:appoinmentId",
+  authenticate,
+  isAdmin,
+  completeAppoinment
+);
 router.put("/assign/:appoinmentId", authenticate, isAdmin, assignStaff);
 
-router.module.exports = router;
+module.exports = router;

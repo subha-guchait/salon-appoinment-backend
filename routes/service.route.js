@@ -11,7 +11,7 @@ const {
 const { authenticate } = require("../middlewares/auth.middleware");
 const { isAdmin } = require("../middlewares/isAdmin.middleware");
 
-router.get("/", authenticate, getServices);
+router.get("/", getServices);
 router.post("/", authenticate, isAdmin, createService);
 router.put("/:serviceId", authenticate, isAdmin, updateService);
 router.delete("/:serviceId", authenticate, isAdmin, deleteService);

@@ -5,7 +5,7 @@ const { getProfile, updateProfile } = require("../services/user.service");
 exports.getProfile = asyncHandler(async (req, res, next) => {
   res.status(200).json({
     sucess: true,
-    data: {
+    profile: {
       name: req.user.name,
       email: req.user.email,
       phone: req.user.phone,

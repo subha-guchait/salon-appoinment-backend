@@ -1,10 +1,12 @@
 const Appoinment = require("../models/appoinment.model");
 const Staff = require("../models/staff.model");
+const Service = require("../models/service.model");
 
 const createNewAppoinment = async (appoinmentData) => {
   try {
     return await Appoinment.create(appoinmentData);
   } catch (err) {
+    console.log(err);
     throw new Error("Unable to create new appoinment");
   }
 };
@@ -12,6 +14,19 @@ const createNewAppoinment = async (appoinmentData) => {
 const getAppoinmentDetails = async (appoinmentId) => {
   try {
     return await Appoinment.findByPk(appoinmentId);
+  } catch (error) {
+    throw new Error("Unable to get appoinment details");
+  }
+};
+const getAppoinmentDetailsWithService = async (appoinmentId) => {
+  try {
+    return await Appoinment.findOne({
+      where: { id: appoinmentId },
+      include: {
+        model: Service,
+        attributes: ["name", "description", "duration"],
+      },
+    });
   } catch (error) {
     throw new Error("Unable to get appoinment details");
   }
@@ -30,10 +45,28 @@ const updateAppoinmentStatus = async (appoinmentId, status) => {
   }
 };
 
+const updateAppoinmentPaymentStatus = async (appoinmentId, paymentStatus) => {
+  try {
+    const appoinment = await Appoinment.findByPk(appoinmentId);
+    if (!appoinment) {
+      throw new Error("Appoinment not found");
+    }
+    appoinment.paymentStatus = paymentStatus;
+
+    return await appoinment.save();
+  } catch (error) {
+    throw new Error("Unable to update appoinment paymentStatus");
+  }
+};
+
 const getUserAppoinments = async (userId) => {
   try {
     return await Appoinment.findAll({
       where: { userId: userId },
+      include: {
+        model: Service,
+        attributes: ["name", "description", "duration"],
+      },
       order: [["createdAt", "DESC"]],
     });
   } catch (err) {
@@ -61,7 +94,7 @@ const assignStaffToAppoinment = async (appoinmentId, staffId) => {
       throw new Error("Staff not found");
     }
 
-    if (staff.specialization !== appoinment.serviceId) {
+    if (staff.serviceId !== appoinment.serviceId) {
       throw new Error(
         "Staff Secialization does not match withh appoinment service"
       );
@@ -82,4 +115,6 @@ module.exports = {
   getUserAppoinments,
   getAllSheduledAppoinments,
   assignStaffToAppoinment,
+  getAppoinmentDetailsWithService,
+  updateAppoinmentPaymentStatus,
 };

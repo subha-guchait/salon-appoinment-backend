@@ -27,7 +27,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/services", serviceRoutes);
-app.use("/api/staff", staffRoutes);
+app.use("/api/staffs", staffRoutes);
 app.use("/api/appoinments", appoinmentRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/reviews", reviewRoutes);
@@ -56,6 +56,9 @@ User.hasMany(Review);
 
 Review.belongsTo(Service);
 Service.hasMany(Review);
+
+Staff.belongsTo(Service);
+Service.hasMany(Staff);
 
 const startServer = async (port) => {
   try {

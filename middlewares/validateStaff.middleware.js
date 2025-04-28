@@ -1,9 +1,9 @@
 const ErrorHandler = require("../utilities/ErrorHandler.utilitiy");
 
 const validateStaff = (req, res, next) => {
-  const { name, email, phone, specialization } = req.body;
+  const { name, email, phone, serviceId } = req.body;
 
-  if (!name || !email || !phone || !specialization) {
+  if (!name || !email || !phone || !serviceId) {
     return next(new ErrorHandler("Provide all the necessary fields", 400));
   }
 
@@ -27,15 +27,8 @@ const validateStaff = (req, res, next) => {
     return next(new ErrorHandler("Phone number must be 10 digits", 400));
   }
 
-  const allowedSpecializations = [
-    "Hair Stylist",
-    "Makeup Artist",
-    "Nail Technician",
-    "Facial Expert",
-    "Massage Therapist",
-  ];
-  if (!allowedSpecializations.includes(specialization)) {
-    return next(new ErrorHandler("Invalid specialization", 400));
+  if (serviceId.length < 1 || serviceId.length > 3) {
+    return next(new ErrorHandler("Invalid serviceId", 400));
   }
 
   next();

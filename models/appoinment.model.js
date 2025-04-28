@@ -14,7 +14,7 @@ const Appoinment = sequelize.define("appoinment", {
     allowNull: false,
   },
   time: {
-    time: Sequelize.TIME,
+    type: Sequelize.TIME,
     allowNull: false,
   },
   amount: {
@@ -22,7 +22,7 @@ const Appoinment = sequelize.define("appoinment", {
     allowNull: false,
   },
   status: {
-    type: DataTypes.ENUM("Scheduled", "Completed", "Cancelled"),
+    type: Sequelize.ENUM("Scheduled", "Completed", "Cancelled"),
     defaultValue: "Scheduled",
   },
 

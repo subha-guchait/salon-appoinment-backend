@@ -4,21 +4,30 @@ const {
   createPaymentOrderId,
   savePaymentDetails,
   updateTransactionStatus,
+  getPaymentDetails,
 } = require("../services/payment.service");
 const { getServiceRecord } = require("../services/service.service");
 const {
   createorder,
   getPaymentStatus,
 } = require("../services/cashfree.service");
-const { getAppoinmentDetails } = require("../services/appoinment.service");
+const {
+  getAppoinmentDetailsWithService,
+  updateAppoinmentPaymentStatus,
+} = require("../services/appoinment.service");
 
 exports.processPayment = asyncHandler(async (req, res, next) => {
-  const { appoinmentId } = req.body;
+  const { appointmentId } = req.body;
+  console.log("appoinment Id .....", appointmentId);
 
   const orderId = createPaymentOrderId();
-  const orderAmount = await getAppoinmentDetails(appoinmentId).amount;
+  const appoinment = await getAppoinmentDetailsWithService(appointmentId);
 
-  if (!amount) {
+  const orderAmount = appoinment.amount;
+
+  console.log("order amount....... ", appoinment);
+
+  if (!orderAmount) {
     return next(new ErrorHandler("service not found", 404));
   }
 
@@ -41,7 +50,17 @@ exports.processPayment = asyncHandler(async (req, res, next) => {
   if (!paymentSessionId) {
     return next(new ErrorHandler("Unable to create payment session", 500));
   }
-
+  console.log({
+    paymentId: orderId,
+    paymentsessionid: paymentSessionId,
+    customerName: customerName,
+    customeremail: customerEmail,
+    customerPhone: customerPhone,
+    amount: orderAmount,
+    currency: orderCurrency,
+    status: "pending",
+    appoinmentId: appointmentId,
+  });
   //save the payment details in the database
   await savePaymentDetails({
     paymentId: orderId,
@@ -52,7 +71,7 @@ exports.processPayment = asyncHandler(async (req, res, next) => {
     amount: orderAmount,
     currency: orderCurrency,
     status: "pending",
-    appoinmentId: appoinmentId,
+    appoinmentId: appointmentId,
   });
 
   res.status(200).json({ sucess: true, paymentSessionId, orderId });
@@ -63,11 +82,21 @@ exports.updatepaymentStatus = asyncHandler(async (req, res, next) => {
 
   const paymentStatus = await getPaymentStatus(paymentId);
 
+  console.log("payment status..........", paymentStatus);
+
   if (!paymentStatus) {
     return next(new ErrorHandler("Unable to get payment status", 500));
   }
 
-  await updateTransactionStatus(orderId, paymentStatus);
+  if (paymentStatus === "Success") {
+    const paymentDetails = await getPaymentDetails(paymentId);
+
+    const appoinmentId = paymentDetails.appoinmentId;
+
+    await updateAppoinmentPaymentStatus(appoinmentId, "Paid");
+  }
+
+  await updateTransactionStatus(paymentId, paymentStatus);
 
   res.status(200).json({ sucess: true, paymentStatus });
 });

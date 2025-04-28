@@ -2,6 +2,7 @@ const {
   generateRandomString,
 } = require("../utilities/generateRandomString.utility");
 const Payment = require("../models/payment.model");
+const Appoinment = require("../models/appoinment.model");
 
 exports.createPaymentOrderId = exports.createPaymentOrderId = () => {
   return `PAY-${generateRandomString()}`;
@@ -28,5 +29,14 @@ exports.updateTransactionStatus = async (paymentId, status) => {
   } catch (err) {
     console.log(err);
     throw new Error("unable to update payment status");
+  }
+};
+
+exports.getPaymentDetails = async (paymentId) => {
+  try {
+    return await Payment.findOne({ where: { paymentId: paymentId } });
+  } catch (err) {
+    console.log(err);
+    throw new Error("Unable to get payment details");
   }
 };

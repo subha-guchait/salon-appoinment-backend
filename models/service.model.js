@@ -25,14 +25,6 @@ const Service = sequelize.define("service", {
     type: Sequelize.FLOAT,
     allowNull: false,
   },
-  availabilityDate: {
-    type: Sequelize.DATEONLY,
-    allowNull: false,
-  },
-  availabilityTime: {
-    type: Sequelize.TIME,
-    allowNull: false,
-  },
 });
 
 module.exports = Service;

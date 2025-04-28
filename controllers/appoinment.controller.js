@@ -8,6 +8,7 @@ const {
   getUserAppoinments,
   getAllSheduledAppoinments,
   assignStaffToAppoinment,
+  getAppoinmentDetailsWithService,
 } = require("../services/appoinment.service");
 const { getServiceRecord } = require("../services/service.service");
 
@@ -18,12 +19,12 @@ exports.bookAppoinment = asyncHandler(async (req, res, next) => {
     return next(new ErrorHandler("Please provide all fields", 400));
   }
 
-  const amount = await getServiceRecord(serviceId).price;
+  const service = await getServiceRecord(serviceId);
 
   const appoinmentData = {
     date,
     time,
-    amount,
+    amount: service.price,
     status: "Scheduled",
     paymentStatus: "Not paid",
     serviceId,
@@ -42,13 +43,15 @@ exports.bookAppoinment = asyncHandler(async (req, res, next) => {
 exports.cancelAppoinment = asyncHandler(async (req, res, next) => {
   const { appoinmentId } = req.params;
 
-  if (appoinmentId) {
+  console.log("appoionment id:.....", appoinmentId);
+
+  if (!appoinmentId) {
     return next(new ErrorHandler("please provide appoinment id", 400));
   }
 
   await updateAppoinmentStatus(appoinmentId, "Cancelled");
 
-  const appoinment = await getAppoinmentDetails(appoinmentId);
+  const appoinment = await getAppoinmentDetailsWithService(appoinmentId);
 
   res.status(200).json({
     sucess: true,
@@ -58,6 +61,8 @@ exports.cancelAppoinment = asyncHandler(async (req, res, next) => {
 
 exports.completeAppoinment = asyncHandler(async (req, res, next) => {
   const { appoinmentId } = req.params;
+
+  console.log("appoionment id:.....", appoinmentId);
 
   if (!appoinmentId) {
     return next(new ErrorHandler("Please provide appoinment id", 400));
