@@ -4,11 +4,11 @@ const router = express.Router();
 
 const { authenticate } = require("../middlewares/auth.middleware");
 const {
-  createReview,
-  getReviewsofService,
-} = require("../services/review.service");
+  submitReview,
+  reviewsofService,
+} = require("../controllers/review.controller");
 
-router.post("/", authenticate, createReview);
-router.get("/:serviceId", authenticate, getReviewsofService);
+router.post("/:appoinmentId", authenticate, submitReview);
+router.get("/:serviceId", authenticate, reviewsofService);
 
 module.exports = router;
